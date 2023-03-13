@@ -77,7 +77,7 @@ public class JMXAgent implements DynamicMBean {
         for (int i = 0; i < attribs.length; i++) {
             attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.attributs.get(i).getClass().getName(),"descr",true,true,false);
         }
-        MBeanInfo mbi = new MBeanInfo(nameBean, "Ma description", attribs,null,null,null);
-        return mbi;
+
+        return new MBeanInfo(nameBean, "Ma description", attribs,null,null,null);
     }
 }
