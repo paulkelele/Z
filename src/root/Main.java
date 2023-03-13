@@ -11,7 +11,7 @@ public class Main {
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = null;
         try {
-            name = new ObjectName("root:type=MOnAgentJmx");
+            name = new ObjectName("root:type=MonAgentJmx");
             JMXAgent jmxAgent = new JMXAgent();
             mbs.registerMBean(jmxAgent,name);
             while (true){
