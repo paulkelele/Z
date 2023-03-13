@@ -1,28 +1,27 @@
 package root;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-         int ac = 12;
-        int [][]   t =   {{12,45},{1,2,3,3}}  ;
-        ArrayList<Integer> f = new ArrayList<>();
-        for (int i = 0; i < t.length; i++) {
-            for (int j = 0; j < t[i].length; j++) {
-                 f.add(t[i][j]);
+
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = null;
+        try {
+            name = new ObjectName("root:type=MOnAgentJmx");
+            JMXAgent jmxAgent = new JMXAgent();
+            mbs.registerMBean(jmxAgent,name);
+            while (true){
+                Thread.sleep(1000);
+                System.out.println("Printing something.........");
             }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-    Agent a = new Agent("P1",0.3);
-    HashMap<String,String> d = new HashMap<>();
-    a.setStates_values( d);
-    a.savePolicy();
-    a.readPolicy();
-        System.out.println(a.getStates_values());
     }
 
 
