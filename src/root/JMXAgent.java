@@ -11,17 +11,18 @@ import java.util.ArrayList;
 public class JMXAgent implements DynamicMBean {
     User user;
     BeanInfo beanInfo;
-
+    String nameBean;
     ArrayList<String> attributs;
     ArrayList<Method> getters;
     ArrayList<Method> setters;
 
-    public JMXAgent( Object o) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+    public JMXAgent( ) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         user =  new User();
         user.setNom("Dupont");
         user.setPrenom("Jean");
         user.setAge(25);
         beanInfo = Introspector.getBeanInfo( user.getClass());
+        nameBean  = user.getClass().getName();
         attributs = new ArrayList<String>();
         getters = new ArrayList<Method>();
         setters = new ArrayList<Method>();
@@ -30,11 +31,9 @@ public class JMXAgent implements DynamicMBean {
     }
 
     private void init() throws InvocationTargetException, IllegalAccessException {
-
         java.beans.PropertyDescriptor[] pd  =  beanInfo.getPropertyDescriptors();
 
         for(PropertyDescriptor pdi : pd){
-
             Method m = pdi.getReadMethod();
             Method p = pdi.getWriteMethod();
             if(m.getName().equals("getClass")) continue;
@@ -74,10 +73,11 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public MBeanInfo getMBeanInfo() {
-        MBeanAttributeInfo [] attributs = new MBeanAttributeInfo[this.attributs.size()];
-        for (int i = 0; i < attributs.length; i++) {
-            attributs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.attributs.get(i).getClass().getName(),"descr",true,true,false);
+        MBeanAttributeInfo [] attribs = new MBeanAttributeInfo[this.attributs.size()];
+        for (int i = 0; i < attribs.length; i++) {
+            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.attributs.get(i).getClass().getName(),"descr",true,true,false);
         }
-        return null;
+        MBeanInfo mbi = new MBeanInfo(nameBean, "Ma description", attribs,null,null,null);
+        return mbi;
     }
 }
