@@ -3,6 +3,7 @@ package root;
 import javax.management.*;
 import java.beans.*;
 import java.beans.IntrospectionException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 public class JMXAgent implements DynamicMBean {
     User user;
     BeanInfo beanInfo;
+    Constructor[] cs;
+    java.lang.reflect.Field[] fields;
     String nameBean;
     ArrayList<String> attributs;
     ArrayList<Method> getters;
@@ -22,6 +25,8 @@ public class JMXAgent implements DynamicMBean {
         user.setPrenom("Jean");
         user.setAge(25);
         beanInfo = Introspector.getBeanInfo( user.getClass());
+        fields = user.getClass().getDeclaredFields();
+        cs = user.getClass().getConstructors();
         nameBean  = user.getClass().getName();
         attributs = new ArrayList<String>();
         getters = new ArrayList<Method>();
@@ -32,7 +37,6 @@ public class JMXAgent implements DynamicMBean {
 
     private void init() throws InvocationTargetException, IllegalAccessException {
         java.beans.PropertyDescriptor[] pd  =  beanInfo.getPropertyDescriptors();
-
         for(PropertyDescriptor pdi : pd){
             Method m = pdi.getReadMethod();
             Method p = pdi.getWriteMethod();
@@ -42,7 +46,9 @@ public class JMXAgent implements DynamicMBean {
             setters.add(p);
         }
 
-
+        for (int i = 0; i < fields.length; i++) {
+            System.out.println(fields[i].getAnnotatedType());
+        }
 
     }
 
@@ -58,11 +64,18 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public AttributeList getAttributes(String[] attributes) {
-        return null;
+        AttributeList attributs = new AttributeList();
+        for (int i = 0; i < this.attributs.size(); i++) {
+            attributs.add(new Attribute(this.attributs.get(i), this.getters.get(i)));
+        }
+
+        return attributs;
     }
 
     @Override
     public AttributeList setAttributes(AttributeList attributes) {
+
+
         return null;
     }
 
@@ -75,9 +88,13 @@ public class JMXAgent implements DynamicMBean {
     public MBeanInfo getMBeanInfo() {
         MBeanAttributeInfo [] attribs = new MBeanAttributeInfo[this.attributs.size()];
         for (int i = 0; i < attribs.length; i++) {
-            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.attributs.get(i).getClass().getName(),"descr",true,true,false);
-        }
 
-        return new MBeanInfo(nameBean, "Ma description", attribs,null,null,null);
+            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.attributs.get(i) ,"descr",true,true,false);
+        }
+        MBeanConstructorInfo[] constructeurs = new MBeanConstructorInfo[cs.length];
+        for (int i = 0; i < cs.length; i++){
+            constructeurs[i] = new MBeanConstructorInfo("User","une description",new MBeanParameterInfo[0]);
+        }
+        return new MBeanInfo(nameBean, "Ma description", attribs,constructeurs,null,null);
     }
 }

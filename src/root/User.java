@@ -3,7 +3,7 @@ package root;
 public class User {
     private String nom;
     private String prenom;
-    private int age;
+    private Integer age;
 
     public String getNom() {
         return nom;
@@ -21,11 +21,11 @@ public class User {
         this.prenom = prenom;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 }
