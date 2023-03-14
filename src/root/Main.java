@@ -1,5 +1,6 @@
 package root;
 
+import com.sun.jdmk.comm.AuthInfo;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
@@ -20,16 +21,18 @@ public class Main {
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = null;
         ObjectName adapterName = null;
+        AuthInfo[] authInfoList = new AuthInfo[1];
         try {
 
             name = new ObjectName("root:type=MonAgentJmx");
             JMXAgent jmxAgent = new JMXAgent();
             mbs.registerMBean(jmxAgent,name);
-
+             AuthInfo authInfo = new AuthInfo("stef","cerise");
+             authInfoList[0] = authInfo;
             // adaptateur html
-            HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer();
+            HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(PORT,authInfoList);
             adapterName = new ObjectName("root:name=htmlAdaptor,port="+PORT);
-            htmlAdaptorServer.setPort(PORT);
+
             mbs.registerMBean(htmlAdaptorServer,adapterName);
             htmlAdaptorServer.start();
             System.out.println("Lancement de l'adaptateur de protocole HTML sur le port "+ PORT);
