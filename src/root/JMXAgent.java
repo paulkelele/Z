@@ -38,6 +38,8 @@ public class JMXAgent implements DynamicMBean {
     ArrayList<Method> getters;
     ArrayList<Method> setters;
     HashMap<String, AnnotatedType> d = new HashMap<>();
+    ArrayList<String> methodsName = new ArrayList<String>();
+
 
     private HashMap<String, Method> methods = new HashMap<String, Method>();
 
@@ -74,8 +76,13 @@ public class JMXAgent implements DynamicMBean {
         }
         //setters.get(0).invoke(user,12);
         for(Method method: user.getClass().getMethods()) {
+            String name = method.getName();
+            if(name.equals("getClass") || name.equals("wait") || name.equals("notifyAll") || name.equals("notify")
+                    || name.equals("hashCode") || name.equals("equals") || name.equals("toString")) continue;
+            methodsName.add(method.getName());
             methods.put(method.getName(), method);
         }
+        System.out.println(methodsName);
     }
 
 
@@ -198,19 +205,21 @@ public class JMXAgent implements DynamicMBean {
         }
 
         // pour les operations
-        MBeanOperationInfo[] operations = new MBeanOperationInfo[2];
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[methodsName.size()];
 
         // on ajoute autant de params qu'il en faut pour la methode dans le tableau de MBeanParameterInfo[]
         MBeanParameterInfo[] param = new MBeanParameterInfo[1];
         param[0] = new MBeanParameterInfo("param", "java.lang.String","Une description");
 
-        operations[0] = new MBeanOperationInfo("Imprime",
-                "impression", param, user.getClass().getName(),
+        for (int i = 0; i < methodsName.size(); i++) {
+            operations[0] = new MBeanOperationInfo(methodsName.get(i), methodsName.get(i), param, user.getClass().getName(),
+                    MBeanOperationInfo.ACTION);
+        }
+        operations[0] = new MBeanOperationInfo("Imprime","impression", param, user.getClass().getName(),
                 MBeanOperationInfo.ACTION);
         operations[1] = new MBeanOperationInfo("setNom", "defiir nom",param,user.getClass().getName(),MBeanOperationInfo.ACTION);
         // pour les notifications
         //...........null
-
 
         return new MBeanInfo(nameBean, "MBean from class "+nameBean, attribs,constructeurs,operations,null);
     }
