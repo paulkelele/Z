@@ -28,4 +28,9 @@ public class User {
     public void setAge(Integer age) {
         this.age = age;
     }
+
+    public String Imprime(String message){
+        System.out.println("j'imprime................. "+ message);
+        return "Yes";
+    }
 }

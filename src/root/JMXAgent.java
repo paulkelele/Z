@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -72,12 +73,9 @@ public class JMXAgent implements DynamicMBean {
 
         }
         //setters.get(0).invoke(user,12);
-        System.out.println(attributs );
-        System.out.println(d);
         for(Method method: user.getClass().getMethods()) {
             methods.put(method.getName(), method);
         }
-        System.out.println(methods);
     }
 
 
@@ -132,28 +130,25 @@ public class JMXAgent implements DynamicMBean {
     }
     @Override
     public AttributeList setAttributes(AttributeList attributes) {
-        // Check attributesto avoid NullPointerException later on
         if (attributes == null) {
             throw new RuntimeOperationsException(
                     new IllegalArgumentException(
                             "AttributeList attributes cannot be null"),
-                    "Cannot invoke a setter of " );
+                    "Cannot invoke a setter of "+nameBean );
         }
         AttributeList resultList = new AttributeList();
-
-        // if attributeNames is empty, nothing more to do
-        if (attributes.isEmpty())
+         if (attributes.isEmpty())
             return resultList;
 
         // try to set each attribute and add to result list if successful
-        for (Iterator i = attributes.iterator(); i.hasNext();) {
-            Attribute attr = (Attribute) i.next();
+        for (Object attribute : attributes) {
+            Attribute attr = (Attribute) attribute;
             try {
                 setAttribute(attr);
                 String name = attr.getName();
                 Object value = getAttribute(name);
-                resultList.add(new Attribute(name,value));
-            } catch(Exception e) {
+                resultList.add(new Attribute(name, value));
+            } catch (Exception e) {
                 // print debug info but keep processing list
                 e.printStackTrace();
             }
@@ -163,8 +158,11 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
+        System.out.println(actionName);
+        System.out.println(methods);
         if (methods.containsKey(actionName))
             try {
+                System.out.println(Arrays.toString(params));
                 return methods.get(actionName).invoke(user, params);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 System.err.println("Erreur lors de l'invocation : " + e.getMessage());
@@ -195,26 +193,28 @@ public class JMXAgent implements DynamicMBean {
         for (int i = 0; i < attribs.length; i++) {
             attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.d.get(this.attributs.get(i)).toString() ,"attrib_"+this.attributs.get(i),true,true,false);
         }
-
+        MBeanParameterInfo[] sansParamInfo = new MBeanParameterInfo[0];
         //Pour les constructeurs
         MBeanConstructorInfo[] constructeurs = new MBeanConstructorInfo[cs.length];
         for (int i = 0; i < cs.length; i++){
-            constructeurs[i] = new MBeanConstructorInfo(cs[i].getName(),cs[i].getName(),null);
+            constructeurs[i] = new MBeanConstructorInfo(cs[i].getName(),cs[i].getName(),sansParamInfo);
         }
 
         // pour les operations
-        MBeanOperationInfo[] operations = new MBeanOperationInfo[3];
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[1];
 
-        MBeanParameterInfo[] sansParamInfo = new MBeanParameterInfo[1];
-        sansParamInfo[0]= new MBeanParameterInfo("nom","java.lang.String", "Aucune");
-        operations[0] = new MBeanOperationInfo("setNom",
-                "setNom", sansParamInfo, user.getClass().getName(),
+        // on ajoute autant de params qu'il en faut pour la methode dans le tableau de MBeanParameterInfo[]
+        MBeanParameterInfo[] param = new MBeanParameterInfo[1];
+        param[0] = new MBeanParameterInfo("param", "java.lang.String","Une description");
+
+        operations[0] = new MBeanOperationInfo("Imprime",
+                "impression", param, user.getClass().getName(),
                 MBeanOperationInfo.ACTION);
 
         // pour les notifications
         //...........null
 
 
-        return new MBeanInfo(nameBean, "Ma description", attribs,constructeurs,null,null);
+        return new MBeanInfo(nameBean, "Ma description", attribs,constructeurs,operations,null);
     }
 }
