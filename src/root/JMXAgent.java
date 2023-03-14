@@ -8,6 +8,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+/**
+ * ----------- Interface DynamicBean
+ *
+ * MBeanInfo getMBeanInfo() * Renvoyer un objet de type MbeanInfo qui encapsule les fonctionnalités exposées par le MBean
+ *
+ * Object getAttribute(String attribute) * Permettre d'obtenir la valeur d'un attribut à partir de son nom
+ *
+ * void setAttribute(Attribute attribute)   * Permettre de mettre à jour la valeur d'un attribut
+ *
+ * AttributeList getAttributes(String[] attributes)  * Permettre d'obtenir la valeur d'un ensemble d'attributs à partir de leurs noms
+ *
+ * AttributeList setAttributes(AttributeList attributes)  * Permettre de mettre à jour la valeur d'un ensemble d'attributs
+ *
+ * Object invoke(String actionName, Object params[], String signature[]) * Permettre d'invoquer une opération
+ */
 
 public class JMXAgent implements DynamicMBean {
     User user;
@@ -52,9 +67,23 @@ public class JMXAgent implements DynamicMBean {
 
     }
 
+
     @Override
     public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
-        return null;
+        Object o = null;
+        for (String m: attributs) {
+            if (attribute.equals(m)){
+                PropertyDescriptor pd = null;
+                try {
+                    pd = new PropertyDescriptor(m, user.getClass());
+                    Method getter = pd.getReadMethod();
+                    o = getter.invoke(user);
+                } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return o;
     }
 
     @Override
@@ -83,6 +112,21 @@ public class JMXAgent implements DynamicMBean {
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
         return null;
     }
+
+    /**
+     *  Class MBeanInfo------------
+     *
+     * MBeanAttributeInfo[] getAttributes() * Renvoyer un tableau de type MBeanAttributeInfo qui contient les métadonnées des attributs
+     *
+     * MBeanConstructorInfo[] getConstructors()  * Renvoyer un tableau de type MBeanConstructorInfo qui contient les métadonnées des constructeurs
+     *
+     * String getDescription()  * Renvoyer une description du MBean
+     *
+     * MBeanNotificationInfo[] getNotifications() * Renvoyer un tableau de type MBeanNotificationInfo qui contient les métadonnées des notifications
+     *
+     * MBeanOperationInfo[] getOperations() * Renvoyer un tableau de type MBeanOperationInfo qui contient les métadonnées des opérations
+     */
+
 
     @Override
     public MBeanInfo getMBeanInfo() {
