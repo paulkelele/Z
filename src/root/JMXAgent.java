@@ -198,7 +198,7 @@ public class JMXAgent implements DynamicMBean {
         }
 
         // pour les operations
-        MBeanOperationInfo[] operations = new MBeanOperationInfo[1];
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[2];
 
         // on ajoute autant de params qu'il en faut pour la methode dans le tableau de MBeanParameterInfo[]
         MBeanParameterInfo[] param = new MBeanParameterInfo[1];
@@ -207,7 +207,7 @@ public class JMXAgent implements DynamicMBean {
         operations[0] = new MBeanOperationInfo("Imprime",
                 "impression", param, user.getClass().getName(),
                 MBeanOperationInfo.ACTION);
-
+        operations[1] = new MBeanOperationInfo("setNom", "defiir nom",param,user.getClass().getName(),MBeanOperationInfo.ACTION);
         // pour les notifications
         //...........null
 
