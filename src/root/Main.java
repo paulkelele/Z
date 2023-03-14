@@ -26,12 +26,15 @@ public class Main {
             JMXAgent jmxAgent = new JMXAgent();
             mbs.registerMBean(jmxAgent,name);
 
+            // adaptateur html
             HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer();
             adapterName = new ObjectName("root:name=htmlAdaptor,port="+PORT);
             htmlAdaptorServer.setPort(PORT);
             mbs.registerMBean(htmlAdaptorServer,adapterName);
             htmlAdaptorServer.start();
             System.out.println("Lancement de l'adaptateur de protocole HTML sur le port "+ PORT);
+
+
 //            JMXServiceURL url = new JMXServiceURL(
 //                    "service:jmx:rmi:///jndi/rmi://localhost:1599/servers");
 //            JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(
