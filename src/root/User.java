@@ -30,7 +30,10 @@ public class User {
     }
 
     public String Imprime(String message){
-        System.out.println("j'imprime................. "+ message);
-        return "Yes";
+        if( message != null){
+            System.out.println("j'imprime................. "+ message);
+            return message;
+        }
+        return "aucun parametre trouvé";
     }
 }
