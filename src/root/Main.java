@@ -44,16 +44,16 @@ public class Main {
 //            cs.start();
 //            System.out.println("Lancement connecteur RMI "+url);
             int i = 0;
-            while ( i<100000000  ){
-                Thread.sleep(1000);
-                System.out.println("Printing something.........");
-                i++;
-            }
+//            while ( i<100000000  ){
+//                Thread.sleep(1000);
+//                System.out.println("Printing something.........");
+//                i++;
+//            }
 
 //            cs.stop();
 //
 //            System.out.println("Arret de l'agent JMX");
-        } catch (InterruptedException e) {
+        } catch ( Exception e) {
             throw new RuntimeException(e);
         }
 
