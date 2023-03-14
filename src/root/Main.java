@@ -27,8 +27,7 @@ public class Main {
             name = new ObjectName("root:type=MonAgentJmx");
             JMXAgent jmxAgent = new JMXAgent();
             mbs.registerMBean(jmxAgent,name);
-             AuthInfo authInfo = new AuthInfo("stef","cerise");
-             authInfoList[0] = authInfo;
+             authInfoList[0] = new AuthInfo("stef","cerise"); // AuthInfo(login,mdp)
             // adaptateur html
             HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(PORT,authInfoList);
             adapterName = new ObjectName("root:name=htmlAdaptor,port="+PORT);
