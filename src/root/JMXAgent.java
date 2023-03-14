@@ -100,6 +100,22 @@ public class JMXAgent implements DynamicMBean {
     }
 
     @Override
+    public AttributeList getAttributes(String[] attributes) {
+        AttributeList attributs = new AttributeList();
+        for (String attribute : attributes) {
+            try {
+                Object value = getAttribute((String) attribute);
+                attributs.add(new Attribute(attribute, value));
+            } catch (AttributeNotFoundException | MBeanException | ReflectionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return attributs;
+    }
+
+
+
+    @Override
     public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
         for(String a: attributs){
             if(attribute.getName().equals(a)){
@@ -114,22 +130,6 @@ public class JMXAgent implements DynamicMBean {
             }
         }
     }
-
-    @Override
-    public AttributeList getAttributes(String[] attributes) {
-        AttributeList attributs = new AttributeList();
-        for (String attribute : attributes) {
-            try {
-                Object value = getAttribute((String) attribute);
-                attributs.add(new Attribute(attribute, value));
-            } catch (AttributeNotFoundException | MBeanException | ReflectionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        System.out.println(attributs);
-        return attributs;
-    }
-
     @Override
     public AttributeList setAttributes(AttributeList attributes) {
         // Check attributesto avoid NullPointerException later on
