@@ -158,11 +158,8 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
-        System.out.println(actionName);
-        System.out.println(methods);
         if (methods.containsKey(actionName))
             try {
-                System.out.println(Arrays.toString(params));
                 return methods.get(actionName).invoke(user, params);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 System.err.println("Erreur lors de l'invocation : " + e.getMessage());
