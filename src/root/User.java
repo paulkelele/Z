@@ -9,7 +9,7 @@ public class User {
         return nom;
     }
 
-    public void setNom(String nom) {
+    public synchronized void setNom(String nom) {
         this.nom = nom;
     }
 
@@ -17,7 +17,7 @@ public class User {
         return prenom;
     }
 
-    public void setPrenom(String prenom) {
+    public synchronized void setPrenom(String prenom) {
         this.prenom = prenom;
     }
 
@@ -25,7 +25,7 @@ public class User {
         return age;
     }
 
-    public void setAge(Integer age) {
+    public synchronized void setAge(Integer age) {
         this.age = age;
     }
 
