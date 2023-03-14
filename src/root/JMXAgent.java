@@ -3,10 +3,7 @@ package root;
 import javax.management.*;
 import java.beans.*;
 import java.beans.IntrospectionException;
-import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +42,7 @@ public class JMXAgent implements DynamicMBean {
 
     public JMXAgent( ) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         user =  new User();
-        user.setNom("Dupont");
+        user.setNom("Dupont" , 2);
         user.setPrenom("Jean");
         user.setAge(25);
         beanInfo = Introspector.getBeanInfo( user.getClass());
@@ -81,8 +78,10 @@ public class JMXAgent implements DynamicMBean {
                     || name.equals("hashCode") || name.equals("equals") || name.equals("toString")) continue;
             methodsName.add(method.getName());
             methods.put(method.getName(), method);
+            Type[] p = method.getParameterTypes();
+            System.out.println(method.getName()+ Arrays.toString( p) + p.length);
         }
-        System.out.println(methodsName);
+        System.out.println(methods);
     }
 
 
@@ -212,8 +211,8 @@ public class JMXAgent implements DynamicMBean {
         param[0] = new MBeanParameterInfo("param", "java.lang.String","Une description");
 
         for (int i = 0; i < methodsName.size(); i++) {
-            operations[0] = new MBeanOperationInfo(methodsName.get(i), methodsName.get(i), param, user.getClass().getName(),
-                    MBeanOperationInfo.ACTION);
+            operations[i] = new MBeanOperationInfo(methodsName.get(i), methodsName.get(i), methodsName.get(i).startsWith("get")?null:param, user.getClass().getName(),
+                    methodsName.get(i).startsWith("get")? MBeanOperationInfo.INFO:MBeanOperationInfo.ACTION);
         }
         operations[0] = new MBeanOperationInfo("Imprime","impression", param, user.getClass().getName(),
                 MBeanOperationInfo.ACTION);

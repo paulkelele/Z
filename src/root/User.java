@@ -9,7 +9,7 @@ public class User {
         return nom;
     }
 
-    public synchronized void setNom(String nom) {
+    public synchronized void setNom(String nom, int i) {
         this.nom = nom;
     }
 
