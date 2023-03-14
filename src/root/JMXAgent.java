@@ -215,6 +215,6 @@ public class JMXAgent implements DynamicMBean {
         //...........null
 
 
-        return new MBeanInfo(nameBean, "Ma description", attribs,constructeurs,operations,null);
+        return new MBeanInfo(nameBean, "MBean from class "+nameBean, attribs,constructeurs,operations,null);
     }
 }
