@@ -3,10 +3,12 @@ package root;
 import javax.management.*;
 import java.beans.*;
 import java.beans.IntrospectionException;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * ----------- Interface DynamicBean
@@ -33,6 +35,9 @@ public class JMXAgent implements DynamicMBean {
     ArrayList<String> attributs;
     ArrayList<Method> getters;
     ArrayList<Method> setters;
+    HashMap<String, AnnotatedType> d = new HashMap<>();
+
+    private HashMap<String, Method> methods = new HashMap<String, Method>();
 
     public JMXAgent( ) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         user =  new User();
@@ -62,20 +67,27 @@ public class JMXAgent implements DynamicMBean {
         }
 
         for (int i = 0; i < fields.length; i++) {
-            System.out.println(fields[i].getAnnotatedType());
-        }
+            d.put(fields[i].getName(),fields[i].getAnnotatedType());
 
+        }
+        //setters.get(0).invoke(user,12);
+        System.out.println(attributs );
+        System.out.println(d);
+        for(Method method: user.getClass().getMethods()) {
+            methods.put(method.getName(), method);
+        }
+        System.out.println(methods);
     }
 
 
     @Override
     public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
         Object o = null;
-        for (String m: attributs) {
-            if (attribute.equals(m)){
+        for (String a: attributs) {
+            if (attribute.equals(a)){
                 PropertyDescriptor pd = null;
                 try {
-                    pd = new PropertyDescriptor(m, user.getClass());
+                    pd = new PropertyDescriptor(a, user.getClass());
                     Method getter = pd.getReadMethod();
                     o = getter.invoke(user);
                 } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
@@ -88,7 +100,18 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
-
+        for(String a: attributs){
+            if(attribute.getName().equals(a)){
+                PropertyDescriptor pd = null;
+                try {
+                    pd = new PropertyDescriptor(a,user.getClass());
+                    Method setter = pd.getWriteMethod();
+                    setter.invoke(user, "");
+                } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     @Override
@@ -110,6 +133,12 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
+        if (methods.containsKey(actionName))
+            try {
+                return methods.get(actionName).invoke(user, params);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                System.err.println("Erreur lors de l'invocation : " + e.getMessage());
+            }
         return null;
     }
 
@@ -130,15 +159,32 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public MBeanInfo getMBeanInfo() {
+
+        // Pour les attributs
         MBeanAttributeInfo [] attribs = new MBeanAttributeInfo[this.attributs.size()];
         for (int i = 0; i < attribs.length; i++) {
-
-            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.attributs.get(i) ,"descr",true,true,false);
+            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.d.get(this.attributs.get(i)).toString() ,"attrib_"+this.attributs.get(i),true,true,false);
         }
+
+        //Pour les constructeurs
         MBeanConstructorInfo[] constructeurs = new MBeanConstructorInfo[cs.length];
         for (int i = 0; i < cs.length; i++){
-            constructeurs[i] = new MBeanConstructorInfo("User","une description",new MBeanParameterInfo[0]);
+            constructeurs[i] = new MBeanConstructorInfo(cs[i].getName(),cs[i].getName(),null);
         }
+
+        // pour les operations
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[methods.size()];
+
+        MBeanParameterInfo[] sansParamInfo = new MBeanParameterInfo[1];
+        sansParamInfo[0]= new MBeanParameterInfo("nom","java.lang.String", "Aucune");
+        operations[0] = new MBeanOperationInfo("setNom",
+                "Setnom", sansParamInfo, "java.lang.String",
+                MBeanOperationInfo.ACTION);
+
+        // pour les notifications
+        //...........null
+
+
         return new MBeanInfo(nameBean, "Ma description", attribs,constructeurs,null,null);
     }
 }
