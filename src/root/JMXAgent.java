@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * ----------- Interface DynamicBean
@@ -106,7 +107,7 @@ public class JMXAgent implements DynamicMBean {
                 try {
                     pd = new PropertyDescriptor(a,user.getClass());
                     Method setter = pd.getWriteMethod();
-                    setter.invoke(user, "");
+                    setter.invoke(user, attribute.getValue());
                 } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -126,9 +127,33 @@ public class JMXAgent implements DynamicMBean {
 
     @Override
     public AttributeList setAttributes(AttributeList attributes) {
+        // Check attributesto avoid NullPointerException later on
+        if (attributes == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException(
+                            "AttributeList attributes cannot be null"),
+                    "Cannot invoke a setter of " );
+        }
+        AttributeList resultList = new AttributeList();
 
+        // if attributeNames is empty, nothing more to do
+        if (attributes.isEmpty())
+            return resultList;
 
-        return null;
+        // try to set each attribute and add to result list if successful
+        for (Iterator i = attributes.iterator(); i.hasNext();) {
+            Attribute attr = (Attribute) i.next();
+            try {
+                setAttribute(attr);
+                String name = attr.getName();
+                Object value = getAttribute(name);
+                resultList.add(new Attribute(name,value));
+            } catch(Exception e) {
+                // print debug info but keep processing list
+                e.printStackTrace();
+            }
+        }
+        return(resultList);
     }
 
     @Override
@@ -173,12 +198,12 @@ public class JMXAgent implements DynamicMBean {
         }
 
         // pour les operations
-        MBeanOperationInfo[] operations = new MBeanOperationInfo[methods.size()];
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[3];
 
         MBeanParameterInfo[] sansParamInfo = new MBeanParameterInfo[1];
         sansParamInfo[0]= new MBeanParameterInfo("nom","java.lang.String", "Aucune");
         operations[0] = new MBeanOperationInfo("setNom",
-                "Setnom", sansParamInfo, "java.lang.String",
+                "setNom", sansParamInfo, user.getClass().getName(),
                 MBeanOperationInfo.ACTION);
 
         // pour les notifications
