@@ -86,7 +86,7 @@ public class JMXAgent implements DynamicMBean {
         Object o = null;
         for (String a: attributs) {
             if (attribute.equals(a)){
-                PropertyDescriptor pd = null;
+                PropertyDescriptor pd;
                 try {
                     pd = new PropertyDescriptor(a, user.getClass());
                     Method getter = pd.getReadMethod();
@@ -118,10 +118,15 @@ public class JMXAgent implements DynamicMBean {
     @Override
     public AttributeList getAttributes(String[] attributes) {
         AttributeList attributs = new AttributeList();
-        for (int i = 0; i < this.attributs.size(); i++) {
-            attributs.add(new Attribute(this.attributs.get(i), this.getters.get(i)));
+        for (String attribute : attributes) {
+            try {
+                Object value = getAttribute((String) attribute);
+                attributs.add(new Attribute(attribute, value));
+            } catch (AttributeNotFoundException | MBeanException | ReflectionException e) {
+                throw new RuntimeException(e);
+            }
         }
-
+        System.out.println(attributs);
         return attributs;
     }
 
