@@ -13,10 +13,6 @@ import java.lang.management.ManagementFactory;
 public class Main {
     static final int PORT = 8005;
     public static void main(String[] args) throws Exception {
-        int a =3;
-        int b = 7;
-        int r = ++a + ++b;
-        System.out.println(a+" "+b+ " "+r);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName adapterName = null;
