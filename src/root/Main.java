@@ -49,7 +49,7 @@ public class Main {
              authInfoList[0] = new AuthInfo("stef","cerise"); // AuthInfo(login,mdp)
             // adaptateur html
             HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(PORT,authInfoList);
-            adapterName = new ObjectName("root:name=htmlAdaptor,port=MonServerWEB");
+            adapterName = new ObjectName("root:type=Type,name=htmlAdaptor,un=1,deux=2,trois=3");
 
             mbs.registerMBean(htmlAdaptorServer,adapterName);
             htmlAdaptorServer.start();
