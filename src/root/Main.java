@@ -2,6 +2,7 @@ package root;
 
 import com.sun.jdmk.comm.AuthInfo;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
+import root.utils.Company;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -14,6 +15,7 @@ public class Main {
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = null;
+        ObjectName name2 = null;
         ObjectName adapterName = null;
         AuthInfo[] authInfoList = new AuthInfo[1];
         try {
@@ -22,10 +24,17 @@ public class Main {
             user.setNom("Dupont");
             user.setPrenom("Jean");
             user.setAge(25);
-            name = new ObjectName("Application:name=toto,type="+user.getClass().getName());
+             name = new ObjectName("Application:type="+user.getClass().getPackageName()+",name="+user.getClass().getSimpleName());
+            Company c = new Company();
+            c.setAdresse("rue bidule");
+            c.setNom("Ma companie");
 
+            name2 = new ObjectName("Application:type="+c.getClass().getPackageName()+",name="+c.getClass().getSimpleName());
             MBeanAgent MBeanAgent = new MBeanAgent(user);
+            MBeanAgent MBeanAgent2 = new MBeanAgent(c);
             mbs.registerMBean(MBeanAgent,name);
+            mbs.registerMBean(MBeanAgent2,name2);
+
              authInfoList[0] = new AuthInfo("stef","cerise"); // AuthInfo(login,mdp)
             // adaptateur html
             HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(PORT,authInfoList);
