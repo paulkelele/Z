@@ -79,7 +79,11 @@ public class JMXAgent implements DynamicMBean {
             methodsName.add(method.getName());
             methods.put(method.getName(), method);
             Type[] p = method.getParameterTypes();
-            System.out.println(method.getName()+ Arrays.toString( p) + p.length);
+            for (Type t: p
+                 ) {
+                System.out.println(t.getTypeName());
+            }
+            //System.out.println(method.getName()+ Arrays.toString( p) + p.length);
         }
         System.out.println(methods);
     }
@@ -216,10 +220,10 @@ public class JMXAgent implements DynamicMBean {
         }
         operations[0] = new MBeanOperationInfo("Imprime","impression", param, user.getClass().getName(),
                 MBeanOperationInfo.ACTION);
-        operations[1] = new MBeanOperationInfo("setNom", "defiir nom",param,user.getClass().getName(),MBeanOperationInfo.ACTION);
+        operations[1] = new MBeanOperationInfo("setNom", "definir nom",param,user.getClass().getName(),MBeanOperationInfo.ACTION);
         // pour les notifications
         //...........null
 
-        return new MBeanInfo(nameBean, "MBean from class "+nameBean, attribs,constructeurs,operations,null);
+        return new MBeanInfo(nameBean, "MBean from class "+nameBean,  attribs, constructeurs, operations,null);
     }
 }
