@@ -2,7 +2,8 @@ package root;
 
 import com.sun.jdmk.comm.AuthInfo;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
-import root.utils.Company;
+import root.utils.Entreprise;
+import root.utils.Organization;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -12,29 +13,43 @@ import java.lang.management.ManagementFactory;
 public class Main {
     static final int PORT = 8005;
     public static void main(String[] args) throws Exception {
+        int a =3;
+        int b = 7;
+        int r = ++a + ++b;
+        System.out.println(a+" "+b+ " "+r);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = null;
-        ObjectName name2 = null;
         ObjectName adapterName = null;
         AuthInfo[] authInfoList = new AuthInfo[1];
+
         try {
             User user = new User();
             user = new User();
             user.setNom("Dupont");
             user.setPrenom("Jean");
             user.setAge(25);
-             name = new ObjectName("Application:type="+user.getClass().getPackageName()+",name="+user.getClass().getSimpleName());
+
             Company c = new Company();
             c.setAdresse("rue bidule");
             c.setNom("Ma companie");
 
-            name2 = new ObjectName("Application:type="+c.getClass().getPackageName()+",name="+c.getClass().getSimpleName());
-            MBeanAgent MBeanAgent = new MBeanAgent(user);
-            MBeanAgent MBeanAgent2 = new MBeanAgent(c);
-            mbs.registerMBean(MBeanAgent,name);
-            mbs.registerMBean(MBeanAgent2,name2);
+            Entreprise e = new Entreprise();
+            e.setAge(41);
+            e.setCorporate("Corpo");
 
+            Organization o = new Organization();
+            o.setAge(52);
+            o.setNom("Mon Organisation");
+
+            Object[] tab = {user, c, e, o};
+            ObjectName[] on = new ObjectName[tab.length];
+            for (int i = 0; i < tab.length; i++) {
+                on[i] = new ObjectName("Application:type="+tab[i].getClass().getPackageName()+",name="+tab[i].getClass().getSimpleName());
+            }
+            for (int i = 0; i < tab.length; i++) {
+                MBeanAgent mba = new MBeanAgent(tab[i]);
+                mbs.registerMBean(mba,on[i]);
+            }
              authInfoList[0] = new AuthInfo("stef","cerise"); // AuthInfo(login,mdp)
             // adaptateur html
             HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(PORT,authInfoList);

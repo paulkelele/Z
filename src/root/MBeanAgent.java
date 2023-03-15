@@ -77,10 +77,6 @@ public class MBeanAgent implements DynamicMBean {
             methods.put(method.getName(), method);
             met.add(method);
         }
-
-       // System.out.println("vv "+ Arrays.toString( o.getClass().getMethods()));
-        System.out.println(methods);
-//        getMBeanParameterInfo(user);
     }
 
 
@@ -209,7 +205,7 @@ public class MBeanAgent implements DynamicMBean {
                 dynParams =  getMBeanParameterInfo(met.get(j));
                 operations[j] = new MBeanOperationInfo(
                     methodsName.get(j),"description of "+methodsName.get(j),dynParams,registerObject.getClass().getName(),
-                    methodsName.get(j).startsWith("get")? MBeanOperationInfo.INFO:MBeanOperationInfo.ACTION_INFO,null);
+                    methodsName.get(j).startsWith("get")? MBeanOperationInfo.INFO:MBeanOperationInfo.ACTION,null);
             }
         // pour les notifications
         //...........null

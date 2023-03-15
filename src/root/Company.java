@@ -1,4 +1,4 @@
-package root.utils;
+package root;
 
 public class Company  {
     private String nom;
