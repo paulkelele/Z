@@ -5,9 +5,7 @@ import java.beans.*;
 import java.beans.IntrospectionException;
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * ----------- Interface DynamicBean
@@ -25,8 +23,8 @@ import java.util.Iterator;
  * Object invoke(String actionName, Object params[], String signature[]) * Permettre d'invoquer une opération
  */
 
-public class JMXAgent implements DynamicMBean {
-    User user;
+public class MBeanAgent implements DynamicMBean {
+    Object registerObject;
     BeanInfo beanInfo;
     Constructor[] cs;
     java.lang.reflect.Field[] fields;
@@ -42,15 +40,12 @@ public class JMXAgent implements DynamicMBean {
 
     private HashMap<String, Method> methods = new HashMap<String, Method>();
 
-    public JMXAgent( ) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
-        user =  new User();
-        user.setNom("Dupont");
-        user.setPrenom("Jean");
-        user.setAge(25);
-        beanInfo = Introspector.getBeanInfo( user.getClass());
-        fields = user.getClass().getDeclaredFields();
-        cs = user.getClass().getConstructors();
-        nameBean  = user.getClass().getName();
+    public MBeanAgent(Object o) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        registerObject = o;
+        beanInfo = Introspector.getBeanInfo( o.getClass());
+        fields = o.getClass().getDeclaredFields();
+        cs = o.getClass().getConstructors();
+        nameBean  = o.getClass().getName();
         attributs = new ArrayList<String>();
         getters = new ArrayList<Method>();
         setters = new ArrayList<Method>();
@@ -74,22 +69,15 @@ public class JMXAgent implements DynamicMBean {
 
         }
         //setters.get(0).invoke(user,12);
-        for(Method method: user.getClass().getMethods()) {
+        for(Method method: registerObject.getClass().getMethods()) {
             String name = method.getName();
             if(name.equals("getClass") || name.equals("wait") || name.equals("notifyAll") || name.equals("notify")
                     || name.equals("hashCode") || name.equals("equals") || name.equals("toString")) continue;
             methodsName.add(method.getName());
             methods.put(method.getName(), method);
             met.add(method);
-            Type[] p = method.getParameterTypes();
-            for (Type t: p
-                 ) {
-//                System.out.println(t.getTypeName());
-            }
-            //System.out.println(method.getName()+ Arrays.toString( p) + p.length);
-            getMBeanParameterInfo(method);
         }
-        Object o = user;
+
        // System.out.println("vv "+ Arrays.toString( o.getClass().getMethods()));
         System.out.println(methods);
 //        getMBeanParameterInfo(user);
@@ -103,9 +91,9 @@ public class JMXAgent implements DynamicMBean {
             if (attribute.equals(a)){
                 PropertyDescriptor pd;
                 try {
-                    pd = new PropertyDescriptor(a, user.getClass());
+                    pd = new PropertyDescriptor(a, registerObject.getClass());
                     Method getter = pd.getReadMethod();
-                    o = getter.invoke(user);
+                    o = getter.invoke(registerObject);
                 } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -136,9 +124,9 @@ public class JMXAgent implements DynamicMBean {
             if(attribute.getName().equals(a)){
                 PropertyDescriptor pd = null;
                 try {
-                    pd = new PropertyDescriptor(a,user.getClass());
+                    pd = new PropertyDescriptor(a,registerObject.getClass());
                     Method setter = pd.getWriteMethod();
-                    setter.invoke(user, attribute.getValue());
+                    setter.invoke(registerObject, attribute.getValue());
                 } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -177,7 +165,7 @@ public class JMXAgent implements DynamicMBean {
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
         if (methods.containsKey(actionName))
             try {
-                return methods.get(actionName).invoke(user, params);
+                return methods.get(actionName).invoke(registerObject, params);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 System.err.println("Erreur lors de l'invocation : " + e.getMessage());
             }
@@ -213,7 +201,6 @@ public class JMXAgent implements DynamicMBean {
         for (int i = 0; i < cs.length; i++){
             constructeurs[i] = new MBeanConstructorInfo(cs[i].getName(),cs[i].getName(),sansParamInfo);
         }
-
         // pour les operations
 
         MBeanOperationInfo[] operations = new MBeanOperationInfo[met.size()];
@@ -221,15 +208,19 @@ public class JMXAgent implements DynamicMBean {
             for (int j = 0; j < met.size(); j++) {
                 dynParams =  getMBeanParameterInfo(met.get(j));
                 operations[j] = new MBeanOperationInfo(
-                    methodsName.get(j),"description of "+methodsName.get(j),dynParams,user.getClass().getName(),
+                    methodsName.get(j),"description of "+methodsName.get(j),dynParams,registerObject.getClass().getName(),
                     methodsName.get(j).startsWith("get")? MBeanOperationInfo.INFO:MBeanOperationInfo.ACTION_INFO,null);
             }
         // pour les notifications
         //...........null
-
         return new MBeanInfo(nameBean, "MBean from class "+nameBean,  attribs, constructeurs, operations,null);
     }
 
+    /**
+     * A partir d'une method, determine le nombre et le type de parametres d'une methode
+     * @param method
+     * @return
+     */
     private MBeanParameterInfo[] getMBeanParameterInfo (Method method){
         if(method.getParameters().length == 0){
             return  null;

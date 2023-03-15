@@ -5,13 +5,7 @@ import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
 import java.lang.management.ManagementFactory;
-import java.rmi.Remote;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 // "C:\Program Files\Java\jdk-17.0.2\bin\java.exe" -cp .;..\..\..\lib\jmxtools.jar root.Main
 public class Main {
@@ -23,10 +17,15 @@ public class Main {
         ObjectName adapterName = null;
         AuthInfo[] authInfoList = new AuthInfo[1];
         try {
+            User user = new User();
+            user = new User();
+            user.setNom("Dupont");
+            user.setPrenom("Jean");
+            user.setAge(25);
+            name = new ObjectName("root:name=toto,type="+user.getClass().getName());
 
-            name = new ObjectName("root:type=MonAgentJmx");
-            JMXAgent jmxAgent = new JMXAgent();
-            mbs.registerMBean(jmxAgent,name);
+            MBeanAgent MBeanAgent = new MBeanAgent(user);
+            mbs.registerMBean(MBeanAgent,name);
              authInfoList[0] = new AuthInfo("stef","cerise"); // AuthInfo(login,mdp)
             // adaptateur html
             HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(PORT,authInfoList);
