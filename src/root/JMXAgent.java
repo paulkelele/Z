@@ -37,12 +37,14 @@ public class JMXAgent implements DynamicMBean {
     HashMap<String, AnnotatedType> d = new HashMap<>();
     ArrayList<String> methodsName = new ArrayList<String>();
 
+    ArrayList<Method> met = new ArrayList<Method>();
+
 
     private HashMap<String, Method> methods = new HashMap<String, Method>();
 
     public JMXAgent( ) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         user =  new User();
-        user.setNom("Dupont" , 2);
+        user.setNom("Dupont");
         user.setPrenom("Jean");
         user.setAge(25);
         beanInfo = Introspector.getBeanInfo( user.getClass());
@@ -78,14 +80,19 @@ public class JMXAgent implements DynamicMBean {
                     || name.equals("hashCode") || name.equals("equals") || name.equals("toString")) continue;
             methodsName.add(method.getName());
             methods.put(method.getName(), method);
+            met.add(method);
             Type[] p = method.getParameterTypes();
             for (Type t: p
                  ) {
-                System.out.println(t.getTypeName());
+//                System.out.println(t.getTypeName());
             }
             //System.out.println(method.getName()+ Arrays.toString( p) + p.length);
+            getMBeanParameterInfo(method);
         }
+        Object o = user;
+       // System.out.println("vv "+ Arrays.toString( o.getClass().getMethods()));
         System.out.println(methods);
+//        getMBeanParameterInfo(user);
     }
 
 
@@ -198,7 +205,7 @@ public class JMXAgent implements DynamicMBean {
         // Pour les attributs
         MBeanAttributeInfo [] attribs = new MBeanAttributeInfo[this.attributs.size()];
         for (int i = 0; i < attribs.length; i++) {
-            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.d.get(this.attributs.get(i)).toString() ,"attrib_"+this.attributs.get(i),true,true,false);
+            attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.d.get(this.attributs.get(i)).toString() ,"attrib_"+this.attributs.get(i),true,false,false);
         }
         MBeanParameterInfo[] sansParamInfo = new MBeanParameterInfo[0];
         //Pour les constructeurs
@@ -208,22 +215,30 @@ public class JMXAgent implements DynamicMBean {
         }
 
         // pour les operations
-        MBeanOperationInfo[] operations = new MBeanOperationInfo[methodsName.size()];
 
-        // on ajoute autant de params qu'il en faut pour la methode dans le tableau de MBeanParameterInfo[]
-        MBeanParameterInfo[] param = new MBeanParameterInfo[1];
-        param[0] = new MBeanParameterInfo("param", "java.lang.String","Une description");
-
-        for (int i = 0; i < methodsName.size(); i++) {
-            operations[i] = new MBeanOperationInfo(methodsName.get(i), methodsName.get(i), methodsName.get(i).startsWith("get")?null:param, user.getClass().getName(),
-                    methodsName.get(i).startsWith("get")? MBeanOperationInfo.INFO:MBeanOperationInfo.ACTION);
-        }
-        operations[0] = new MBeanOperationInfo("Imprime","impression", param, user.getClass().getName(),
-                MBeanOperationInfo.ACTION);
-        operations[1] = new MBeanOperationInfo("setNom", "definir nom",param,user.getClass().getName(),MBeanOperationInfo.ACTION);
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[met.size()];
+            MBeanParameterInfo[] dynParams = null;
+            for (int j = 0; j < met.size(); j++) {
+                dynParams =  getMBeanParameterInfo(met.get(j));
+                operations[j] = new MBeanOperationInfo(
+                    methodsName.get(j),"description of "+methodsName.get(j),dynParams,user.getClass().getName(),
+                    methodsName.get(j).startsWith("get")? MBeanOperationInfo.INFO:MBeanOperationInfo.ACTION_INFO,null);
+            }
         // pour les notifications
         //...........null
 
         return new MBeanInfo(nameBean, "MBean from class "+nameBean,  attribs, constructeurs, operations,null);
+    }
+
+    private MBeanParameterInfo[] getMBeanParameterInfo (Method method){
+        if(method.getParameters().length == 0){
+            return  null;
+        }
+        Type[] p = method.getParameterTypes();
+        MBeanParameterInfo[] params = new MBeanParameterInfo[method.getParameters().length];
+        for (int i = 0; i < params.length; i++) {
+            params[i] = new MBeanParameterInfo(method.getName(), p[i].getTypeName(),"Description of "+method.getName());;
+        }
+        return  params;
     }
 }
