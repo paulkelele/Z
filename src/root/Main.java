@@ -22,7 +22,7 @@ public class Main {
             user.setNom("Dupont");
             user.setPrenom("Jean");
             user.setAge(25);
-            name = new ObjectName("root:name=toto,type="+user.getClass().getName());
+            name = new ObjectName("Application:name=toto,type="+user.getClass().getName());
 
             MBeanAgent MBeanAgent = new MBeanAgent(user);
             mbs.registerMBean(MBeanAgent,name);

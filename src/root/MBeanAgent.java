@@ -228,7 +228,7 @@ public class MBeanAgent implements DynamicMBean {
         Type[] p = method.getParameterTypes();
         MBeanParameterInfo[] params = new MBeanParameterInfo[method.getParameters().length];
         for (int i = 0; i < params.length; i++) {
-            params[i] = new MBeanParameterInfo(method.getName(), p[i].getTypeName(),"Description of "+method.getName());;
+            params[i] = new MBeanParameterInfo(method.getName(), p[i].getTypeName(),"Description of "+method.getName());
         }
         return  params;
     }
