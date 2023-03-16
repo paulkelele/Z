@@ -5,6 +5,8 @@ import java.beans.*;
 import java.beans.IntrospectionException;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -186,19 +188,24 @@ public class MBeanAgent implements DynamicMBean {
     @Override
     public MBeanInfo getMBeanInfo() {
 
+        MBeanFeatureInfo[] m = new MBeanFeatureInfo[1];
+        MBeanFeatureInfo d = new MBeanFeatureInfo("Organization", "Extend Organisation");
+
         // Pour les attributs
         MBeanAttributeInfo [] attribs = new MBeanAttributeInfo[this.attributs.size()];
         for (int i = 0; i < attribs.length; i++) {
             attribs[i] = new MBeanAttributeInfo(this.attributs.get(i),this.d.get(this.attributs.get(i)).toString() ,"attrib_"+this.attributs.get(i),true,false,false);
         }
         MBeanParameterInfo[] sansParamInfo = new MBeanParameterInfo[0];
+
         //Pour les constructeurs
+
         MBeanConstructorInfo[] constructeurs = new MBeanConstructorInfo[cs.length];
         for (int i = 0; i < cs.length; i++){
             constructeurs[i] = new MBeanConstructorInfo(cs[i].getName(),cs[i].getName(),sansParamInfo);
         }
-        // pour les operations
 
+        // pour les operations
         MBeanOperationInfo[] operations = new MBeanOperationInfo[met.size()];
             MBeanParameterInfo[] dynParams = null;
             for (int j = 0; j < met.size(); j++) {
@@ -209,7 +216,8 @@ public class MBeanAgent implements DynamicMBean {
             }
         // pour les notifications
         //...........null
-        return new MBeanInfo(nameBean, "MBean from class "+nameBean,  attribs, constructeurs, operations,null);
+        MBeanInfo mBeanInfo = new MBeanInfo(nameBean, "MBean from class "+nameBean,  attribs, constructeurs, operations,null,null);
+        return mBeanInfo;
     }
 
     /**

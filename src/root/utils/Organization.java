@@ -1,22 +1,25 @@
 package root.utils;
 
 public class Organization {
-    private String nom;
-    private int age;
+    private String nomOrganization;
+    private int ageOrganization;
 
-    public String getNom() {
-        return nom;
+    public Organization(){
+
+    }
+    public String getNomOrganization() {
+        return nomOrganization;
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setNomOrganization(String nomOrganization) {
+        this.nomOrganization = nomOrganization;
     }
 
-    public int getAge() {
-        return age;
+    public int getAgeOrganization() {
+        return ageOrganization;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setAgeOrganization(int ageOrganization) {
+        this.ageOrganization = ageOrganization;
     }
 }

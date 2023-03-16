@@ -1,15 +1,24 @@
 package root;
 
-public class Company  {
+import root.utils.Organization;
+
+public class Company {
     private String nom;
     private String adresse;
 
-    public String getNom() {
+    public Company(){
+
+    }
+    public Company(String nom){
+
+    }
+
+    public String getNomOrganization() {
         return nom;
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setNomOrganization(String nomOrganization) {
+        this.nom = nomOrganization;
     }
 
     public String getAdresse() {

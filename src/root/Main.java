@@ -26,18 +26,18 @@ public class Main {
             user.setAge(25);
 
             Company c = new Company();
-            c.setAdresse("rue bidule");
-            c.setNom("Ma companie");
+            c.setAdresse("rue Ma rue");
+            c.setNomOrganization("Ma Compagnie");
 
             Entreprise e = new Entreprise();
             e.setAge(41);
             e.setCorporate("Corpo");
 
-            Organization o = new Organization();
-            o.setAge(52);
-            o.setNom("Mon Organisation");
+//            Organization o = new Organization();
+//            o.setAgeOrganization(52);
+//            o.setNomOrganization("Mon Organisation");
 
-            Object[] tab = {user, c, e, o};
+            Object[] tab = {user, c, e };
             ObjectName[] on = new ObjectName[tab.length];
             for (int i = 0; i < tab.length; i++) {
                 on[i] = new ObjectName("Application:type="+tab[i].getClass().getPackageName()+",name="+tab[i].getClass().getSimpleName());
