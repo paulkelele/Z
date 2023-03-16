@@ -22,4 +22,6 @@ public class Organization {
     public void setAgeOrganization(int ageOrganization) {
         this.ageOrganization = ageOrganization;
     }
+
+
 }

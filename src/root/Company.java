@@ -2,7 +2,7 @@ package root;
 
 import root.utils.Organization;
 
-public class Company {
+public class Company  {
     private String nom;
     private String adresse;
 
