@@ -27,7 +27,7 @@ public class Main {
 
             Company c = new Company();
             c.setAdresse("rue Ma rue");
-            c.setNomOrganization("Ma Compagnie");
+            c.setNom("Ma Compagnie");
 
             Entreprise e = new Entreprise();
             e.setAge(41);
@@ -63,11 +63,11 @@ public class Main {
 //            cs.start();
 //            System.out.println("Lancement connecteur RMI "+url);
             int i = 0;
-//            while ( i<100000000  ){
-//                Thread.sleep(1000);
-//                System.out.println("Printing something.........");
-//                i++;
-//            }
+            while ( i<Integer.MAX_VALUE  ){
+                Thread.sleep(1000);
+                System.out.println(e.getAge());
+                i++;
+            }
 
 //            cs.stop();
 //

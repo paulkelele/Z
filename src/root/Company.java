@@ -7,18 +7,14 @@ public class Company  {
     private String adresse;
 
     public Company(){
-
-    }
-    public Company(String nom){
-
     }
 
-    public String getNomOrganization() {
+    public String getNom() {
         return nom;
     }
 
-    public void setNomOrganization(String nomOrganization) {
-        this.nom = nomOrganization;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     public String getAdresse() {
