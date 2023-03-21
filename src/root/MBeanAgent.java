@@ -57,6 +57,7 @@ public class MBeanAgent implements DynamicMBean {
 
     private void init() throws InvocationTargetException, IllegalAccessException {
         java.beans.PropertyDescriptor[] pd  =  beanInfo.getPropertyDescriptors();
+
         for(PropertyDescriptor pdi : pd){
             Method m = pdi.getReadMethod();
             Method p = pdi.getWriteMethod();
@@ -217,6 +218,7 @@ public class MBeanAgent implements DynamicMBean {
         // pour les notifications
         //...........null
         MBeanInfo mBeanInfo = new MBeanInfo(nameBean, "MBean from class "+nameBean,  attribs, constructeurs, operations,null,null);
+
         return mBeanInfo;
     }
 
