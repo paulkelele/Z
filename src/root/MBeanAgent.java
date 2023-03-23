@@ -208,11 +208,15 @@ public class MBeanAgent implements DynamicMBean {
         // pour les operations
         MBeanOperationInfo[] operations = new MBeanOperationInfo[met.size()];
         MBeanParameterInfo[] dynParams = null;
-        for (int j = 0; j < met.size(); j++) {
-            dynParams = getMBeanParameterInfo(met.get(j));
-            operations[j] = new MBeanOperationInfo(
-                    methodsName.get(j), "description of " + methodsName.get(j), dynParams, registerObject.getClass().getName(),
-                    methodsName.get(j).startsWith("get") ? MBeanOperationInfo.INFO : MBeanOperationInfo.ACTION, null);
+        try {
+            for (int j = 0; j < met.size(); j++) {
+                dynParams = getMBeanParameterInfo(met.get(j));
+                operations[j] = new MBeanOperationInfo(
+                        methodsName.get(j), "description of " + methodsName.get(j), dynParams, registerObject.getClass().getName(),
+                        methodsName.get(j).startsWith("get") ? MBeanOperationInfo.INFO : MBeanOperationInfo.ACTION, null);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         // pour les notifications
         //...........null
