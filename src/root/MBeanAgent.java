@@ -5,6 +5,8 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.HashMap;
  */
 
 public class MBeanAgent implements DynamicMBean {
+    PrintStream out = System.out ;
     private final HashMap<String, Method> methods = new HashMap<String, Method>();
     Object registerObject;
     BeanInfo beanInfo;
@@ -49,7 +52,6 @@ public class MBeanAgent implements DynamicMBean {
         getters = new ArrayList<Method>();
         setters = new ArrayList<Method>();
         init();
-
     }
 
     private void init() throws InvocationTargetException, IllegalAccessException {
