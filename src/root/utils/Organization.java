@@ -4,9 +4,10 @@ public class Organization {
     private String nomOrganization;
     private int ageOrganization;
 
-    public Organization(){
+    public Organization() {
 
     }
+
     public String getNomOrganization() {
         return nomOrganization;
     }
