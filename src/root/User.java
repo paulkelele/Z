@@ -29,9 +29,9 @@ public class User {
         this.age = age;
     }
 
-    public String Imprime(String message){
-        if( message != null){
-            System.out.println("j'imprime................. "+ message);
+    public String Imprime(String message) {
+        if (message != null) {
+            System.out.println("j'imprime................. " + message);
             return message;
         }
         return "aucun parametre trouvé";
